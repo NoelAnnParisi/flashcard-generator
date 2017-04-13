@@ -82,12 +82,11 @@ const makeClozeCard = () => {
                 }
             });
         };
-        if (!flashcard.text.includes(flashcard.cloze)) {
+        if (!flashcard.text.toLowerCase().includes(flashcard.cloze.toLowerCase())) {
             console.log("HMMMM I don't see the answer in your sentence Let's try again!");
             makeAnother();
         } else {
-            // cloze 
-            const clozeCard = new Cards.ClozeCard(flashcard.text, flashcard.cloze);
+            const clozeCard = new Cards.ClozeCard(flashcard.text.toLowerCase(), flashcard.cloze.toLowerCase());
             clozeCardSet.push(clozeCard);
             makeAnother();
         };
@@ -104,8 +103,7 @@ const studyClozeCards = (arr, x) => {
             message: card.replaceText(),
             name: "answer"
         }]).then(answer => {
-        	answer.answer.toLowerCase();
-            if (answer.answer === card.cloze) {
+            if (answer.answer.toLowerCase() === card.cloze) {
                 console.log('CORRECT!');
             } else {
                 console.log('Not quite!');
