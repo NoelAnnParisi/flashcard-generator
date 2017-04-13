@@ -13,14 +13,13 @@ const beginInteraction = () => {
         name: "cards"
     }]).then(answer => {
         if (answer.cards === 'Basic Flashcards') {
-        	//begin making basic flashcards
+            //begin making basic flashcards
             makeBasiccard();
         } else {
-        	//begin making cloze flashcards
+            //begin making cloze flashcards
             makeClozeCard();
         }
     });
-
 };
 
 //prompt users to make basic flashcards
@@ -34,7 +33,7 @@ const makeBasiccard = () => {
         message: "What should the 'back' of the flashcard say? (the answer)",
         name: "back"
     }]).then(flashcard => {
-    	//instansiate new BasicCard object
+        //instansiate new BasicCard object
         const basicCard = new Cards.BasicCard(flashcard.front, flashcard.back.toLowerCase());
         //add card to the basic card array
         basicCardSet.push(basicCard);
@@ -46,7 +45,7 @@ const makeBasiccard = () => {
             name: "continue"
         }]).then(data => {
             if (data.continue === "Yes, please!") {
-            	//some recursive action
+                //some recursive action
                 makeBasiccard();
             } else {
                 //pass the array of BasicCards, & length, to studyBasic
@@ -66,8 +65,7 @@ const studyBasic = (arr, x) => {
             message: card.front,
             name: "answer"
         }]).then(answer => {
-            answer.answer.toLowerCase();
-            if (answer.answer === card.back) {
+            if (answer.answer.toLowerCase() === card.back.toLowerCase()) {
                 console.log('CORRECT!');
             } else {
                 console.log('Not quite!');
@@ -76,8 +74,20 @@ const studyBasic = (arr, x) => {
             x -= 1;
             studyBasic(arr, x);
         });
+        //ask user if they'd like to go through the cards again
     } else {
-        console.log('All done!');
+        inquirer.prompt([{
+            type: "list",
+            message: "Would you like to try again?",
+            choices: ["Yes, please!", "No, I'm ready!"],
+            name: "keepStudying"
+        }]).then(answer => {
+            if (answer.keepStudying === "Yes, please!") {
+                studyBasic(basicCardSet, basicCardSet.length);
+            } else {
+                console.log('See you later and good luck!');
+            }
+        });
     }
 };
 
@@ -129,16 +139,27 @@ const studyClozeCards = (arr, x) => {
             name: "answer"
         }]).then(answer => {
             if (answer.answer.toLowerCase() === card.cloze) {
-            	console.log(card.showDeletedText(), 'was correct!');
+                console.log(card.showDeletedText(), 'was correct!');
             } else {
                 console.log('Not quite!', card.revealFullText(), "is the correct answer");
-                
+
             }
             x -= 1;
             studyClozeCards(arr, x);
         });
     } else {
-        console.log('All done!');
+        inquirer.prompt([{
+            type: "list",
+            message: "Would you like to try again?",
+            choices: ["Yes, please!", "No, I'm ready!"],
+            name: "keepStudying"
+        }]).then(answer => {
+            if (answer.keepStudying === "Yes, please!") {
+                studyClozeCards(clozeCardSet, clozeCardSet.length);
+            } else {
+                console.log('See you later and good luck!');
+            }
+        });
     }
 };
 
