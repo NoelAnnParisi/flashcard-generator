@@ -1,8 +1,10 @@
-var inquirer = require('inquirer');
-var basicCardSet = [];
-var clozeCardSet = [];
+const inquirer = require('inquirer');
+const Cards = require('./cards.js');
 
-var makeBasiccard = function() {
+const basicCardSet = [];
+const clozeCardSet = [];
+
+const makeBasiccard = () => {
     inquirer.prompt([{
         type: "input",
         message: "Type in the question for the 'front' of the flashcard!",
@@ -11,35 +13,52 @@ var makeBasiccard = function() {
         type: "input",
         message: "Type the answer to that question for the 'back' of the flashcard!",
         name: "back"
-    }]).then(function(flashcard) {
-        function BasicCard(front, back) {
-            this.front = flashcard.front;
-            this.back = flashcard.back;
-        }
-        BasicCard.prototype.revealAnswer = function() {
-            console.log(`The answer is ${this.back}`);
-        }
-        var basicCard = new BasicCard(flashcard.front, flashcard.back);
+    }]).then(flashcard => {
+        const basicCard = new Cards.BasicCard(flashcard.front, flashcard.back.toLowerCase());
         basicCardSet.push(basicCard);
-        console.log(basicCardSet);
-
         inquirer.prompt([{
             type: "list",
             message: "Want to make another?",
-            choices: ["Yes", "All Finished let's study!"],
+            choices: ["Yes", "All finished let's study!"],
             name: "continue"
         }]).then(function(data) {
             if (data.continue === "Yes") {
                 makeBasiccard();
             } else {
-                console.log(basicCardSet);
+                // console.log(basicCardSet);
+                studyBasic(basicCardSet, basicCardSet.length);
             }
 
         });
     });
 }
 
-var makeClozeCard = function() {
+const studyBasic = (arr, x) => {
+    if (x > 0) {
+        const card = arr[x - 1];
+        // console.log(card); 
+        inquirer.prompt([{
+            type: "input",
+            message: card.front,
+            name: "answer"
+        }]).then(answer => {
+        	answer.answer.toLowerCase();
+            if (answer.answer === card.back) {
+                console.log('CORRECT!');
+            } else {
+                console.log('not quite!');
+                card.revealAnswer();
+            }
+            x -= 1;
+            studyBasic(arr, x);
+        });
+    } else {
+        console.log('All done!');
+    }
+};
+
+
+const makeClozeCard = () => {
     inquirer.prompt([{
         type: "input",
         message: "Type in the full sentence that you want to memorize!",
@@ -48,18 +67,18 @@ var makeClozeCard = function() {
         type: "input",
         message: "Type the portion of the sentence you want to remove!",
         name: "cloze"
-    }]).then(function(flashcard) {
-        var makeAnother = function() {
+    }]).then(flashcard => {
+        const makeAnother = () => {
             inquirer.prompt([{
                 type: "list",
                 message: "Want to make another?",
-                choices: ["Yes", "All Finished let's study!"],
+                choices: ["Yes", "All finished let's study!"],
                 name: "continue"
-            }]).then(function(data) {
+            }]).then(data => {
                 if (data.continue === "Yes") {
                     makeClozeCard();
                 } else {
-                    console.log(clozeCardSet);
+                    studyClozeCards(clozeCardSet, clozeCardSet.length);
                 }
             });
         };
@@ -67,31 +86,37 @@ var makeClozeCard = function() {
             console.log("HMMMM I don't see the answer in your sentence Let's try again!");
             makeAnother();
         } else {
-            function ClozeCard(text, cloze) {
-                this.text = flashcard.text, //full sentence
-                    this.cloze = flashcard.back //deleted text       
-            };
-            var clozeCard = new ClozeCard(flashcard.text, flashcard.cloze);
+            // cloze 
+            const clozeCard = new Cards.ClozeCard(flashcard.text, flashcard.cloze);
             clozeCardSet.push(clozeCard);
             makeAnother();
         };
-        // have a property or method that contains or returns only the cloze-deleted portion of the text.
-        // ClozeCard.prototype.showDeletedText = function() {
-        //         console.log(flashcard.cloze);
-        //     }
-        //     // ClozeCard should have a property or method that contains or returns only the partial text.
-        // ClozeCard.prototype.replaceText = function() {
-        //     var ellipsis = "...";
-        //     var partialText = flashcard.text.replace(flashcard.cloze, ellipsis);
-        //     // ClozeCard should throw or log an error when the cloze deletion does not appear in the input text.
 
-        //     return (partialText);
-        // };
-        // // ClozeCard should have a property or method that contains or returns only the full text.
-        // ClozeCard.prototype.revealFullText = function() {
-        //     console.log(flashcard.text);
-        // }
     });
+}
+
+const studyClozeCards = (arr, x) => {
+    if (x > 0) {
+        const card = arr[x - 1];
+        // console.log(card); 
+        inquirer.prompt([{
+            type: "input",
+            message: card.replaceText(),
+            name: "answer"
+        }]).then(answer => {
+        	answer.answer.toLowerCase();
+            if (answer.answer === card.cloze) {
+                console.log('CORRECT!');
+            } else {
+                console.log('Not quite!');
+                card.revealFullText();
+            }
+            x -= 1;
+            studyClozeCards(arr, x);
+        });
+    } else {
+        console.log('All done!');
+    }
 }
 
 inquirer.prompt([{
@@ -99,7 +124,7 @@ inquirer.prompt([{
     message: "How would you like to  study today?",
     choices: ["Basic flash cards", "Cloze flash cards"],
     name: "cards"
-}]).then(function(answer) {
+}]).then(answer => {
     if (answer.cards === 'Basic flash cards') {
         makeBasiccard();
     } else {
