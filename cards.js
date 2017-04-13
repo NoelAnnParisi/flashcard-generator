@@ -16,18 +16,17 @@ function ClozeCard(text, cloze) {
 
 // have a property or method that contains or returns only the cloze-deleted portion of the text.
 ClozeCard.prototype.showDeletedText = function() {
-    console.log(this.cloze);
+    return this.cloze;
 }
 // ClozeCard should have a property or method that contains or returns only the partial text.
 ClozeCard.prototype.replaceText = function() {
     const ellipsis = "...";
     const partialText = this.text.replace(this.cloze, ellipsis);
-    // ClozeCard should throw or log an error when the cloze deletion does not appear in the input text.
     return partialText;
 };
 // ClozeCard should have a property or method that contains or returns only the full text.
 ClozeCard.prototype.revealFullText = function() {
-    console.log(this.text);
+    return this.text;
 }
 
 module.exports = {
