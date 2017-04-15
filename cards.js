@@ -30,6 +30,6 @@ ClozeCard.prototype.revealFullText = function() {
 }
 
 module.exports = {
-	BasicCard: BasicCard,
-	ClozeCard: ClozeCard
+	BasicCard,
+	ClozeCard
 }; 

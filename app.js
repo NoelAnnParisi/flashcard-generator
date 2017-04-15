@@ -4,14 +4,55 @@ const Cards = require('./cards.js');
 const basicCardSet = [];
 const clozeCardSet = [];
 
-//Prompt user interaction with file
+//instansiate the inquirer prompt
+const inq = (args) => {
+    return inquirer.prompt(args);
+}
+
+
+const startPrompt = [{
+    type: "list",
+    message: "How would you like to study today?",
+    choices: ["Basic Flashcards", "Cloze Flashcards"],
+    name: "cards"
+}];
+
+const basicCardPrompt = [{
+    type: "input",
+    message: "What should the 'front' of the flashcard say? (the question)",
+    name: "front"
+}, {
+    type: "input",
+    message: "What should the 'back' of the flashcard say? (the answer)",
+    name: "back"
+}];
+
+const clozeCardPrompt = [{
+    type: "input",
+    message: "Write out the full sentence you wish to memorize.",
+    name: "text"
+}, {
+    type: "input",
+    message: "Now, write out the portion of the sentence you wish to remove for studying purposes.",
+    name: "cloze"
+}];
+
+const makeAnotherPrompt = [{
+    type: "list",
+    message: "Do you want to make another?",
+    choices: ["Yes, please!", "I'm finished, let's study!"],
+    name: "continue"
+}];
+
+const keepStudyingPrompt = [{
+    type: "list",
+    message: "Would you like to try again?",
+    choices: ["Yes, please!", "No, I'm ready!"],
+    name: "keepStudying"
+}];
+
 const beginInteraction = () => {
-    inquirer.prompt([{
-        type: "list",
-        message: "How would you like to study today?",
-        choices: ["Basic Flashcards", "Cloze Flashcards"],
-        name: "cards"
-    }]).then(answer => {
+    inq(startPrompt).then(answer => {
         if (answer.cards === 'Basic Flashcards') {
             //begin making basic flashcards
             makeBasiccard();
@@ -24,15 +65,7 @@ const beginInteraction = () => {
 
 //prompt users to make basic flashcards
 const makeBasiccard = () => {
-    inquirer.prompt([{
-        type: "input",
-        message: "What should the 'front' of the flashcard say? (the question)",
-        name: "front"
-    }, {
-        type: "input",
-        message: "What should the 'back' of the flashcard say? (the answer)",
-        name: "back"
-    }]).then(flashcard => {
+    inq(basicCardPrompt).then(flashcard => {
         //instansiate new BasicCard object
         const basicCard = new Cards.BasicCard(flashcard.front, flashcard.back.toLowerCase());
         //add card to the basic card array
@@ -76,12 +109,7 @@ const studyBasic = (arr, x) => {
         });
         //ask user if they'd like to go through the cards again
     } else {
-        inquirer.prompt([{
-            type: "list",
-            message: "Would you like to try again?",
-            choices: ["Yes, please!", "No, I'm ready!"],
-            name: "keepStudying"
-        }]).then(answer => {
+        inq(keepStudyingPrompt).then(answer => {
             if (answer.keepStudying === "Yes, please!") {
                 studyBasic(basicCardSet, basicCardSet.length);
             } else {
@@ -93,22 +121,9 @@ const studyBasic = (arr, x) => {
 
 //prompt users to make close cards
 const makeClozeCard = () => {
-    inquirer.prompt([{
-        type: "input",
-        message: "Write out the full sentence you wish to memorize.",
-        name: "text"
-    }, {
-        type: "input",
-        message: "Now, write out the portion of the sentence you wish to remove for studying purposes.",
-        name: "cloze"
-    }]).then(flashcard => {
+    inq(clozeCardPrompt).then(flashcard => {
         const makeAnother = () => {
-            inquirer.prompt([{
-                type: "list",
-                message: "Do you want to make another?",
-                choices: ["Yes, please!", "I'm finished, let's study!"],
-                name: "continue"
-            }]).then(data => {
+            inq(makeAnotherPrompt).then(data => {
                 if (data.continue === "Yes, please!") {
                     makeClozeCard();
                 } else {
@@ -148,12 +163,7 @@ const studyClozeCards = (arr, x) => {
             studyClozeCards(arr, x);
         });
     } else {
-        inquirer.prompt([{
-            type: "list",
-            message: "Would you like to try again?",
-            choices: ["Yes, please!", "No, I'm ready!"],
-            name: "keepStudying"
-        }]).then(answer => {
+        inq(keepStudyingPrompt).then(answer => {
             if (answer.keepStudying === "Yes, please!") {
                 studyClozeCards(clozeCardSet, clozeCardSet.length);
             } else {
