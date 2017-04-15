@@ -9,7 +9,7 @@ const inq = (args) => {
     return inquirer.prompt(args);
 }
 
-
+//initializing various prompts 
 const startPrompt = [{
     type: "list",
     message: "How would you like to study today?",
@@ -51,6 +51,7 @@ const keepStudyingPrompt = [{
     name: "keepStudying"
 }];
 
+//begin interaction function
 const beginInteraction = () => {
     inq(startPrompt).then(answer => {
         if (answer.cards === 'Basic Flashcards') {
